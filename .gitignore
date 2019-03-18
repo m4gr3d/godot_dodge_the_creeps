@@ -1,0 +1,7 @@
+.idea/
+.import/
+assets/art/.DS_Store
+bin/osx/
+cmake-build-debug/
+src/*.os
+.sconsign.dblite

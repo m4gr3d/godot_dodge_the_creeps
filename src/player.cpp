@@ -3,10 +3,12 @@
 #include <Viewport.hpp>
 #include <AnimatedSprite.hpp>
 #include <gen/CollisionShape2D.hpp>
+#include <gen/InputEventScreenTouch.hpp>
 
 using namespace godot;
 
 void Player::_register_methods() {
+    register_method("_input", &Player::_input);
     register_method("_process", &Player::_process);
     register_method("_ready", &Player::_ready);
     register_method("_on_player_body_entered", &Player::_on_player_body_entered);
@@ -25,23 +27,23 @@ void Player::_ready() {
     hide();
 }
 
+void Player::_input(const godot::Ref<godot::InputEvent> event) {
+    // Change the target whenever a touch happens.
+    auto* screen_touch_event = cast_to<InputEventScreenTouch>(*event);
+    if (screen_touch_event && screen_touch_event->is_pressed()) {
+        click_target = screen_touch_event->get_position();
+        Godot::print("Received input event.");
+    }
+}
+
 void Player::_process(float delta) {
     Vector2 velocity; // The player's movement vector.
-    auto *input = Input::get_singleton();
-    if (input->is_action_pressed("ui_right")) {
-        velocity.x += 1;
-    }
-
-    if (input->is_action_pressed("ui_left")) {
-        velocity.x -= 1;
-    }
-
-    if (input->is_action_pressed("ui_down")) {
-        velocity.y += 1;
-    }
-
-    if (input->is_action_pressed("ui_up")) {
-        velocity.y -= 1;
+    // Move toward the target and stop when close.
+    Vector2 position = get_position();
+    if (position.distance_to(click_target) > 10) {
+        velocity = (click_target - position).normalized() * speed;
+    } else {
+        velocity = Vector2();
     }
 
     auto *animated_sprite = cast_to<AnimatedSprite>(get_node("AnimatedSprite"));
@@ -52,9 +54,7 @@ void Player::_process(float delta) {
         animated_sprite->stop();
     }
 
-    Vector2 new_pos = get_position() + (velocity * delta);
-    new_pos = Vector2(std::clamp(new_pos.x, 0.0f, screen_size.x),
-                      std::clamp(new_pos.y, 0.0f, screen_size.y));
+    Vector2 new_pos = position + (velocity * delta);
     set_position(new_pos);
 
     if (velocity.x != 0) {
@@ -75,6 +75,8 @@ void Player::_on_player_body_entered(godot::PhysicsBody2D *body) {
 
 void Player::start(godot::Vector2 pos) {
     set_position(pos);
+    // Initial target is the start position.
+    click_target = pos;
     show();
     cast_to<CollisionShape2D>(get_node("CollisionShape2D"))->set_disabled(false);
 }

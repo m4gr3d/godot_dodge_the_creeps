@@ -3,6 +3,7 @@
 
 #include <Area2D.hpp>
 #include <Godot.hpp>
+#include <InputEvent.hpp>
 #include <PhysicsBody2D.hpp>
 
 namespace godot {
@@ -16,6 +17,7 @@ namespace godot {
         void _init();
         void _ready();
         void _process(float delta);
+        void _input(const Ref<InputEvent> event);
         void _on_player_body_entered(PhysicsBody2D* body);
         void start(Vector2 pos);
 
@@ -24,6 +26,8 @@ namespace godot {
         int speed;
         // Size of the game window.
         Vector2 screen_size;
+        // Hold the clicked position.
+        Vector2 click_target;
     };
 
 }   // namespace godot

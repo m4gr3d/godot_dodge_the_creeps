@@ -1,7 +1,9 @@
+*.apk
 .idea/
 .import/
 assets/art/.DS_Store
 bin/osx/
+bin/x11/
 cmake-build-debug/
 src/*.os
 .sconsign.dblite

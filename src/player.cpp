@@ -32,7 +32,6 @@ void Player::_input(const godot::Ref<godot::InputEvent> event) {
     auto* screen_touch_event = cast_to<InputEventScreenTouch>(*event);
     if (screen_touch_event && screen_touch_event->is_pressed()) {
         click_target = screen_touch_event->get_position();
-        Godot::print("Received input event.");
     }
 }
 
